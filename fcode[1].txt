@@ -1,0 +1,139 @@
+Python code:
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Step 1: Create a Synthetic Dataset and Save it as CSV
+def create_dataset():
+    data = {
+        'Age': [45, 34, 50, 28, 60, 35, 67, 40, 55, 33, 41, 39, 48, 52, 47, 33, 56, 39, 43, 55, 37, 60, 45, 40, 33, 44, 50, 37, 41, 60, 56, 34, 49, 45, 39, 41, 43, 34, 52, 59],
+        'Blood Pressure': [130, 110, 150, 120, 140, 115, 160, 125, 135, 145, 128, 115, 140, 145, 135, 125, 150, 130, 120, 125, 135, 140, 125, 120, 130, 145, 130, 115, 125, 135, 150, 120, 140, 125, 130, 120, 125, 145, 120, 135],
+        'Cholesterol': [200, 180, 220, 190, 240, 210, 250, 180, 230, 220, 210, 190, 225, 235, 220, 210, 245, 215, 200, 230, 220, 245, 210, 205, 225, 215, 240, 210, 220, 200, 255, 190, 230, 215, 200, 215, 220, 210, 230, 205],
+        'Disease 1 (Hypertension)': [0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1],
+        'Disease 2 (Diabetes)': [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+        'Disease 3 (Heart Disease)': [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
+        'Disease 4 (Cancer)': [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0],
+        'Disease 5 (Kidney Disease)': [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+        'Disease 6 (Lung Disease)': [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+        'Disease 7 (Arthritis)': [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+        'Disease 8 (Stroke)': [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+        'Disease 9 (Obesity)': [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+        'Disease 10 (Asthma)': [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
+    }
+
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Save the DataFrame to a CSV file
+    df.to_csv('disease_data_40_samples.csv', index=False)
+    print("CSV file 'disease_data_40_samples.csv' created successfully!")
+
+# Step 2: Train the Model and Accept User Inputs for Symptoms
+def disease_prediction():
+    # Load the dataset from CSV file
+    df = pd.read_csv('disease_data_40_samples.csv')  # Ensure this matches the CSV file name in the create_dataset function
+
+    # Prepare features (X) and target variables (Y)
+    X = df.drop(columns=['Disease 1 (Hypertension)', 'Disease 2 (Diabetes)', 'Disease 3 (Heart Disease)', 'Disease 4 (Cancer)', 
+                         'Disease 5 (Kidney Disease)', 'Disease 6 (Lung Disease)', 'Disease 7 (Arthritis)', 'Disease 8 (Stroke)', 
+                         'Disease 9 (Obesity)', 'Disease 10 (Asthma)'])
+    y = df[['Disease 1 (Hypertension)', 'Disease 2 (Diabetes)', 'Disease 3 (Heart Disease)', 'Disease 4 (Cancer)', 
+            'Disease 5 (Kidney Disease)', 'Disease 6 (Lung Disease)', 'Disease 7 (Arthritis)', 'Disease 8 (Stroke)', 
+            'Disease 9 (Obesity)', 'Disease 10 (Asthma)']]
+
+    # Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train the RandomForestClassifier model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+
+    # Model Evaluation (Accuracy)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f'Accuracy: {accuracy * 100:.2f}%')
+
+    # Accept input from the user for symptoms
+    try:
+        # Get user input for symptoms
+        print("\nEnter your symptoms:")
+
+        age = float(input("Age (e.g., 45): "))
+        blood_pressure = float(input("Blood Pressure (e.g., 130): "))
+        cholesterol = float(input("Cholesterol level (e.g., 210): "))
+
+        # Prepare the input data for prediction
+        new_data = pd.DataFrame([[age, blood_pressure, cholesterol]], columns=['Age', 'Blood Pressure', 'Cholesterol'])
+
+        # Make the prediction
+        disease_prediction = model.predict(new_data)
+
+        # Disease Names
+        diseases = [
+            "Hypertension", "Diabetes", "Heart Disease", "Cancer", "Kidney Disease",
+            "Lung Disease", "Arthritis", "Stroke", "Obesity", "Asthma"
+        ]
+
+      
+  # Find predicted diseases
+        predicted_diseases = [diseases[i] for i in range(len(disease_prediction[0])) if disease_prediction[0][i] == 1]
+
+        # Doctor Suggestions
+        doctor_suggestion = {
+            "Hypertension": "Cardiologist", "Diabetes": "Endocrinologist", "Heart Disease": "Cardiologist", "Cancer": "Oncologist",
+            "Kidney Disease": "Nephrologist", "Lung Disease": "Pulmonologist", "Arthritis": "Rheumatologist", "Stroke": "Neurologist",
+            "Obesity": "Nutritionist", "Asthma": "Pulmonologist"
+        }
+
+        # Print the Medical Report
+        print("\n--- Medical Report ---")
+        print(f"Predicted Diseases: {', '.join(predicted_diseases)}")
+        for disease in predicted_diseases:
+            suggested_doctor = doctor_suggestion.get(disease, "General Practitioner")
+            print(f"Suggested Doctor for {disease}: {suggested_doctor}")
+
+    except ValueError:
+        print("Invalid input! Please enter valid numerical values for symptoms.")
+
+# Run the create dataset function
+create_dataset()
+
+# Run the disease prediction function
+disease_prediction()
+
+
+
+
+CSV code:
+
+import pandas as pd
+
+# Step 1: Create a Synthetic Dataset and Save it as CSV
+def create_dataset():
+    data = {
+        'Age': [45, 34, 50, 28, 60, 35, 67, 40, 55, 33, 41, 39, 48, 52, 47, 33, 56, 39, 43, 55, 37, 60, 45, 40, 33, 44, 50, 37, 41, 60, 56, 34, 49, 45, 39, 41, 43, 34, 52, 59],
+        'Blood Pressure': [130, 110, 150, 120, 140, 115, 160, 125, 135, 145, 128, 115, 140, 145, 135, 125, 150, 130, 120, 125, 135, 140, 125, 120, 130, 145, 130, 115, 125, 135, 150, 120, 140, 125, 130, 120, 125, 145, 120, 135],
+        'Cholesterol': [200, 180, 220, 190, 240, 210, 250, 180, 230, 220, 210, 190, 225, 235, 220, 210, 245, 215, 200, 230, 220, 245, 210, 205, 225, 215, 240, 210, 220, 200, 255, 190, 230, 215, 200, 215, 220, 210, 230, 205],
+        'Disease 1 (Hypertension)': [0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1],
+        'Disease 2 (Diabetes)': [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+        'Disease 3 (Heart Disease)': [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
+        'Disease 4 (Cancer)': [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0],
+        'Disease 5 (Kidney Disease)': [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+        'Disease 6 (Lung Disease)': [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+        'Disease 7 (Arthritis)': [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+        'Disease 8 (Stroke)': [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+        'Disease 9 (Obesity)': [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+        'Disease 10 (Asthma)': [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1]
+    }
+    
+    # Create DataFrame from the dictionary
+    df = pd.DataFrame(data)
+
+    # Save the DataFrame to a CSV file
+    df.to_csv('disease_data_40_samples.csv', index=False)
+    print("CSV file 'disease_data_40_samples.csv' created successfully!")
+
+# Call the function to generate the CSV file
+create_dataset()
